@@ -12,7 +12,7 @@
         #total { font-weight: bold; font-size: 20px; color: #27ae60; }
         button { background: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
         button:hover { background: #219653; }
-        form { display: none; margin-top: 20px; }
+        #paySection { display: none; margin-top: 20px; }
         input[type="text"] { padding: 10px; width: 80%; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
     </style>
 </head>
@@ -23,25 +23,52 @@
         <div class="product"><input type="checkbox" id="samosa"> Samosa <input type="number" id="samosaQty" min="0" value="0" onchange="calc()"> - 30 KSH</div>
         <div class="product"><input type="checkbox" id="ugali"> Ugali <input type="number" id="ugaliQty" min="0" value="0" onchange="calc()"> - 20 KSH</div>
         <div id="total">Total: 0 KSH</div>
-        <form id="payForm" action="https://mpepetest.xo.je/pay.php" method="POST">
-            <input type="text" name="phone" placeholder="07xxxxxxxx" required>
-            <input type="hidden" name="amount" id="amount">
-            <button type="submit">Pay with M-Pesa</button>
-        </form>
+
+        <div id="paySection">
+            <input type="text" id="phone" placeholder="07xxxxxxxx" required>
+            <button onclick="sendPayment()">Pay with M-Pesa</button>
+        </div>
+
         <button onclick="calc()">Calculate & Pay</button>
         <p style="font-size:12px;color:#777;">Sandbox mode — no real money</p>
     </div>
 
     <script>
+        let totalAmount = 0;
+
         function calc() {
             const p = { tea:50, samosa:30, ugali:20 };
-            let total = 0;
-            if (document.getElementById('tea').checked) total += p.tea * (parseInt(document.getElementById('teaQty').value) || 0);
-            if (document.getElementById('samosa').checked) total += p.samosa * (parseInt(document.getElementById('samosaQty').value) || 0);
-            if (document.getElementById('ugali').checked) total += p.ugali * (parseInt(document.getElementById('ugaliQty').value) || 0);
-            document.getElementById('total').innerText = `Total: ${total} KSH`;
-            document.getElementById('amount').value = total;
-            document.getElementById('payForm').style.display = total > 0 ? 'block' : 'none';
+            totalAmount = 0;
+            if (document.getElementById('tea').checked) totalAmount += p.tea * (parseInt(document.getElementById('teaQty').value) || 0);
+            if (document.getElementById('samosa').checked) totalAmount += p.samosa * (parseInt(document.getElementById('samosaQty').value) || 0);
+            if (document.getElementById('ugali').checked) totalAmount += p.ugali * (parseInt(document.getElementById('ugaliQty').value) || 0);
+            document.getElementById('total').innerText = `Total: ${totalAmount} KSH`;
+            document.getElementById('paySection').style.display = totalAmount > 0 ? 'block' : 'none';
+        }
+
+        function sendPayment() {
+            const phone = document.getElementById('phone').value.trim();
+            if (!phone || totalAmount < 1) {
+                alert("Enter phone and select items!");
+                return;
+            }
+
+            // SEND DATA USING JAVASCRIPT (WORKS 100%)
+            const formData = new FormData();
+            formData.append('phone', phone);
+            formData.append('amount', totalAmount);
+
+            fetch('https://mpepetest.xo.je/pay.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Show result in a popup
+                const win = window.open('', '_blank');
+                win.document.write('<pre>' + data + '</pre>');
+            })
+            .catch(err => alert("Error: " + err));
         }
     </script>
 </body>
