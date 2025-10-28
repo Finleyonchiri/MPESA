@@ -3,118 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Store Demo</title>
+    <title>M-Pesa Store Demo</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f2f5, #e0e4e8);
-            min-height: 100vh;
-        }
-        .store-container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
-            margin: 20px auto;
-            border: 1px solid #ddd;
-        }
-        .product {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 15px 0;
-            padding: 10px;
-            background: #fafafa;
-            border-radius: 8px;
-        }
-        .product input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .product input[type="checkbox"] { margin-right: 10px; }
-        #summary { font-size: 18px; color: #2c3e50; margin: 20px 0; font-weight: bold; }
-        #total { font-size: 22px; color: #27ae60; margin: 20px 0; }
-        button {
-            padding: 12px 25px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
+        body { font-family: Arial; text-align: center; background: #f0f2f5; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .product { display: flex; justify-content: space-between; margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; }
+        input[type="number"] { width: 60px; padding: 5px; text-align: center; }
+        #total { font-weight: bold; font-size: 20px; color: #27ae60; }
+        button { background: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
         button:hover { background: #219653; }
-        .note { color: #7f8c8d; font-size: 14px; margin-top: 15px; }
         form { display: none; margin-top: 20px; }
-        input[type="text"] {
-            padding: 10px;
-            width: 80%;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+        input[type="text"] { padding: 10px; width: 80%; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div class="store-container">
-        <h2 style="color: #2c3e50; margin-bottom: 20px;">Online Store Demo</h2>
-        <div class="product"><input type="checkbox" id="tea"> Tea <input type="number" id="teaQty" min="0" value="0" onchange="updateTotal()"> - 50 KSH</div>
-        <div class="product"><input type="checkbox" id="samosa"> Samosa <input type="number" id="samosaQty" min="0" value="0" onchange="updateTotal()"> - 30 KSH</div>
-        <div class="product"><input type="checkbox" id="ugali"> Ugali <input type="number" id="ugaliQty" min="0" value="0" onchange="updateTotal()"> - 20 KSH</div>
-        <div id="summary"></div>
+    <div class="card">
+        <h2>M-Pesa Store Demo</h2>
+        <div class="product"><input type="checkbox" id="tea"> Tea <input type="number" id="teaQty" min="0" value="0" onchange="calc()"> - 50 KSH</div>
+        <div class="product"><input type="checkbox" id="samosa"> Samosa <input type="number" id="samosaQty" min="0" value="0" onchange="calc()"> - 30 KSH</div>
+        <div class="product"><input type="checkbox" id="ugali"> Ugali <input type="number" id="ugaliQty" min="0" value="0" onchange="calc()"> - 20 KSH</div>
         <div id="total">Total: 0 KSH</div>
-        <form id="paymentForm" action="https://mpepetest.xo.je/pay.php" method="POST">
-            <input type="text" name="phone" placeholder="Enter phone (07...)" required>
+        <form id="payForm" action="https://mpepetest.xo.je/pay.php" method="POST">
+            <input type="text" name="phone" placeholder="07xxxxxxxx" required>
             <input type="hidden" name="amount" id="amount">
             <button type="submit">Pay with M-Pesa</button>
         </form>
-        <button onclick="calculateTotal()">Calculate & Pay</button>
-        <p class="note">Demo in sandbox mode: No real money charged. Live next month.</p>
+        <button onclick="calc()">Calculate & Pay</button>
+        <p style="font-size:12px;color:#777;">Sandbox mode — no real money</p>
     </div>
 
     <script>
-        function updateTotal() {
-            const prices = { tea: 50, samosa: 30, ugali: 20 };
+        function calc() {
+            const p = { tea:50, samosa:30, ugali:20 };
             let total = 0;
-            let summary = "Selected: ";
-            const items = [];
-
-            if (document.getElementById('tea').checked) {
-                const qty = parseInt(document.getElementById('teaQty').value) || 0;
-                total += prices.tea * qty;
-                if (qty > 0) items.push(`${qty} Tea`);
-            }
-            if (document.getElementById('samosa').checked) {
-                const qty = parseInt(document.getElementById('samosaQty').value) || 0;
-                total += prices.samosa * qty;
-                if (qty > 0) items.push(`${qty} Samosa`);
-            }
-            if (document.getElementById('ugali').checked) {
-                const qty = parseInt(document.getElementById('ugaliQty').value) || 0;
-                total += prices.ugali * qty;
-                if (qty > 0) items.push(`${qty} Ugali`);
-            }
-
-            document.getElementById('total').textContent = `Total: ${total} KSH`;
-            document.getElementById('summary').textContent = items.length ? summary + items.join(', ') : '';
+            if (document.getElementById('tea').checked) total += p.tea * (parseInt(document.getElementById('teaQty').value) || 0);
+            if (document.getElementById('samosa').checked) total += p.samosa * (parseInt(document.getElementById('samosaQty').value) || 0);
+            if (document.getElementById('ugali').checked) total += p.ugali * (parseInt(document.getElementById('ugaliQty').value) || 0);
+            document.getElementById('total').innerText = `Total: ${total} KSH`;
             document.getElementById('amount').value = total;
-        }
-
-        function calculateTotal() {
-            updateTotal();
-            if (document.getElementById('amount').value > 0) {
-                document.getElementById('paymentForm').style.display = 'block';
-            } else {
-                alert('Please select at least one item with a quantity!');
-            }
+            document.getElementById('payForm').style.display = total > 0 ? 'block' : 'none';
         }
     </script>
 </body>
