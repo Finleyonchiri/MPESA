@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Store</title>
+    <title>Online Store Demo</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -65,19 +65,19 @@
 </head>
 <body>
     <div class="store-container">
-        <h2 style="color: #2c3e50; margin-bottom: 20px;">Online Store</h2>
+        <h2 style="color: #2c3e50; margin-bottom: 20px;">Online Store Demo</h2>
         <div class="product"><input type="checkbox" id="tea"> Tea <input type="number" id="teaQty" min="0" value="0" onchange="updateTotal()"> - 50 KSH</div>
         <div class="product"><input type="checkbox" id="samosa"> Samosa <input type="number" id="samosaQty" min="0" value="0" onchange="updateTotal()"> - 30 KSH</div>
         <div class="product"><input type="checkbox" id="ugali"> Ugali <input type="number" id="ugaliQty" min="0" value="0" onchange="updateTotal()"> - 20 KSH</div>
         <div id="summary"></div>
         <div id="total">Total: 0 KSH</div>
-        <form id="paymentForm" action="pay.php" method="POST">
+        <form id="paymentForm" action="https://mpepetest.xo.je/pay.php" method="POST">
             <input type="text" name="phone" placeholder="Enter phone (07...)" required>
             <input type="hidden" name="amount" id="amount">
             <button type="submit">Pay with M-Pesa</button>
         </form>
         <button onclick="calculateTotal()">Calculate & Pay</button>
-        <p class="note">Sandbox mode: No real money charged yet.</p>
+        <p class="note">Demo in sandbox mode: No real money charged. Live next month.</p>
     </div>
 
     <script>
